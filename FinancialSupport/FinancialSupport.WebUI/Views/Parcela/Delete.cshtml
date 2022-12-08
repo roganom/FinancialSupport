@@ -1,0 +1,32 @@
+﻿@model FinancialSupport.Application.DTOs.ParcelaDTO
+
+<h3>Exclusão de usuários</h3>
+
+<h4>"Você tem certeza que quer excluir esta parcela?"</h4>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model=> model.IdEmprestimo) <br />
+            @Html.DisplayNameFor(model=> model.DataParcela) <br />
+            @Html.DisplayNameFor(model=> model.ValorParcela) <br />
+            @Html.DisplayNameFor(model=> model.DataPagamento) <br />
+            @Html.DisplayNameFor(model=> model.ValorPagamento) <br />
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.IdEmprestimo) <br />
+            @Html.DisplayFor(model => model.DataParcela) <br />
+            @Html.DisplayFor(model => model.ValorParcela) <br />
+            @Html.DisplayFor(model => model.DataPagamento) <br />
+            @Html.DisplayFor(model => model.ValorPagamento) <br />
+        </dd>
+    </dl>
+    <hr />
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Delete" class="btn btn-danger" />
+        <a asp-action="Index" class="btn btn-info"> Voltar para a lista</a>
+    </form>
+</div>

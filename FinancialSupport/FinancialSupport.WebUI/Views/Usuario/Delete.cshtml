@@ -1,0 +1,30 @@
+﻿@model FinancialSupport.Application.DTOs.UsuarioDTO
+
+<h3>Exclusão de usuários</h3>
+
+<h4>"Você tem certeza que quer excluir este usuário?"</h4>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model=> model.Nome) <br />
+            @Html.DisplayNameFor(model=> model.Foto) <br />
+            @Html.DisplayNameFor(model=> model.Limite) <br />
+            @Html.DisplayNameFor(model=> model.LimiteDisponivel) <br />
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Nome) <br />
+            @Html.DisplayFor(model => model.Foto) <br />
+            @Html.DisplayFor(model => model.Limite) <br />
+            @Html.DisplayFor(model => model.LimiteDisponivel) <br />
+        </dd>
+    </dl>
+    <hr />
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit"value="Delete" class="btn btn-danger" />
+        <a asp-action="Index" class="btn btn-info"> Voltar para a lista</a>
+    </form>
+</div>

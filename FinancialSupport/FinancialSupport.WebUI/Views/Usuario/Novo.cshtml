@@ -1,0 +1,38 @@
+﻿@using FinancialSupport.WebUI.ViewModels.Shared
+@model FinancialSupport.WebUI.ViewModels.NovoEmpestimoViewModel
+@{
+    ViewData["Title"] = "Criar novo empréstimo para o clientexxx";
+}
+<h2>@ViewData["Title"]</h2>
+
+
+
+<form asp-action="Novo" method="post">
+    <div class="form-horizontal">
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model=> model.Nome) <br />
+                @Html.DisplayNameFor(model=> model.NumeroParcelas) <br />
+                @Html.DisplayNameFor(model=> model.LimiteDisponivel) <br />
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Nome) <br />
+                @Html.DisplayFor(model => model.NumeroParcelas) <br />
+                @Html.DisplayFor(model => model.LimiteDisponivel) <br />
+            </dd>
+        </dl>
+        Entre com o valor do empréstimo:
+        <input asp-for="Valor" class="form-control" />
+        <input type="hidden" asp-for="IdUsuario" />
+        <input type="hidden" asp-for="Nome" />
+        <input type="hidden" asp-for="NumeroParcelas" />
+        <hr />
+        <div class"form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Incluir" class="btn btn-success" />
+                <a asp-action="Index" class="btn btn-info"> Voltar para a lista</a>
+            </div>
+        </div>
+    </div>
+</form>

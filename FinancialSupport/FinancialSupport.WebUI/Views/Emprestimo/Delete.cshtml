@@ -1,0 +1,31 @@
+﻿@model FinancialSupport.Application.DTOs.EmprestimoDTO
+
+<h3>Exclusão de usuários</h3>
+
+<h4>"Você tem certeza que quer excluir este empréstimo?"</h4>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model=> model.IdUsuario) <br />
+            @Html.DisplayNameFor(model=> model.Valor) <br />
+            @Html.DisplayNameFor(model=> model.Data) <br />
+            @Html.DisplayNameFor(model=> model.Ativo) <br />
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.IdUsuario) <br />
+            @Html.DisplayFor(model => model.Valor) <br />
+            @Html.DisplayFor(model => model.Data) <br />
+            @Html.DisplayFor(model => model.Ativo) <br />
+        </dd>
+    </dl>
+    <hr />
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Delete" class="btn btn-danger" />
+        <a asp-action="Index" class="btn btn-info"> Voltar para a lista</a>
+    </form>
+
+</div>
