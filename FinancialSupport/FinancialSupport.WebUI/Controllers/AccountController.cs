@@ -25,7 +25,8 @@ namespace FinancialSupport.WebUI.Controllers
             
             if (result)
             {
-                return Redirect("/");
+                return RedirectToAction("Index", "Home");
+                //return Redirect("/FinancialSupport/");
             }
             else
             {
@@ -66,7 +67,8 @@ namespace FinancialSupport.WebUI.Controllers
         public async Task<IActionResult> Logout()
         {
             await _autentication.Logout();
-            return Redirect("/Account/Login");
+            return RedirectToAction("Index", "Home");
+            //return Redirect("/FinancialSupport/Account/Login");
         }
     }
 }
