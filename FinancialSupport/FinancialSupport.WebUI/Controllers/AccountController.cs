@@ -15,7 +15,7 @@ namespace FinancialSupport.WebUI.Controllers
         }
 
         #region Consulta lista de usuários
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> Consulta(int? id, int? tipoMensagem, string? mensagem)
         {
