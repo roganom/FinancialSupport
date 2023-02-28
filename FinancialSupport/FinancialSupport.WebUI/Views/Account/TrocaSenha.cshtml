@@ -1,0 +1,53 @@
+﻿@using FinancialSupport.WebUI.ViewModels.Shared;
+@model FinancialSupport.WebUI.ViewModels.TrocaSenhaViewModel
+
+@{
+    if (!Model.Equals(null))
+        await Html.RenderPartialAsync("_CustomMessagePartial", new CustomMessagePartialViewModel() { TipoMensagem = @Model.CustomMessagePartial.TipoMensagem, Mensagem = @Model.CustomMessagePartial.Mensagem });
+}
+
+<h3>Troca de senha do usuário</h3>
+
+<div class="row">
+    <div class="col-md-12">
+        <form asp-controller="Account" asp-action="TrocaSenha" method="post">
+            <div asp-validation-summary="All" class="text-danger">
+            </div>
+            @*        SÓ MOSTRAR*@
+            <div class="form-group">
+                Usuário: <b>@Context.User.Identity.Name</b>
+                <br/>
+                <br />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="OldPassword"> </label>
+                <input asp-for="OldPassword" class="form-control" />
+                <span asp-validation-for="OldPassword" class="text-danger"></span>
+            </div>
+ 
+            <div class="form-group">
+                <label asp-for="NewPassword"> </label>
+                <input asp-for="NewPassword" class="form-control" />
+                <span asp-validation-for="NewPassword" class="text-danger"></span>
+            </div>
+                        
+            <div class="form-group">
+                <label asp-for="ConfirmNewPassword"> </label>
+                <input asp-for="ConfirmNewPassword" class="form-control" />
+                <span asp-validation-for="ConfirmNewPassword" class="text-danger"></span>
+            </div>
+            <br />
+            <div class="form-group">
+                <input type="hidden" name="Email" value="@Context.User.Identity.Name" />
+                <input type="submit" value="Trocar senha" name="TrocaSenha" class="btn btn-primary" />
+@*                <a asp-controller="Home" asp-action="Index" class="btn btn-info"> Voltar</a>*@
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts
+    {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

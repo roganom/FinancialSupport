@@ -1,0 +1,137 @@
+﻿@model FinancialSupport.WebUI.ViewModels.DetalhesClienteViewModel
+
+<h3> Detalhes do cliente</h3>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">
+            @if (!ViewBag.ImageExist)
+            {
+                <img src="~/imagens/SemImagem.jpg" class="rounded-circle" height="150" width="110" asp-append-version="true" />
+            }
+            else
+            {
+                <img src="~/imagens/@Model.Foto" class="rounded-circle" height="150" width="110" asp-append-version="true" />
+            }
+        </dt>
+        <dd class="col-sm-10"> @Html.DisplayFor(model => model.Nome) </dd>
+        <dt class="col-sm-5"> Limite do cliente:  </dt>
+        <dd class="col-sm-10"> @Html.DisplayFor(model => model.Limite) </dd>
+
+    </dl>
+    <hr />
+    <dl class="row">
+        @if (Model.EmprestimosAtivos.Count > 0)
+        {
+            <h4>Empréstimos do cliente</h4>
+            <div class="panel panel-default">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>
+                                Data
+                            </th>
+                            <th>
+                                Valor do empréstimo
+                            </th>
+                            <th>
+                                Valor de cada parcela
+                            </th>
+                            <th>
+                                Parcela pagas
+                            </th>
+                            <th>
+                                Parcela atrasadas
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.EmprestimosAtivos)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Data)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Valor)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ValorParcela)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.QtdeParcelasPagas)/60
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.QtdeParcelasAtrasadas)
+                                </td>
+                                <br/>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <br/>
+        }
+        @if (Model.EmprestimosAtivos.Count == 0)
+        {
+        <h4>Cliente não tem empréstimos ativos</h4>
+        }
+        <hr />
+        <dl class="row">
+        @if (Model.EmprestimosHistoricos.Count > 0)
+        {
+            <h4> Histórico de emprestimos do usuário</h4>
+            <div class="panel panel-default">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>
+                                Data
+                            </th>
+                            <th>
+                                Valor do empréstimo
+                            </th>
+                            <th>
+                                Parcelas
+                            </th>
+                            <th>
+                                Observação
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.EmprestimosHistoricos)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.EmprestimoInativoIdData)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.EmprestimoInativoIdValor)
+                                </td>
+                                <td>
+                                    60 parcelas de R$ @Html.DisplayFor(modelItem => item.EmprestimoInativoIdValorDasParcelas)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.EmprestimoInativoIdNumeroDeParcelasEmAtraso) pagas em atraso
+                                </td>
+                                <br/>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        @if (Model.EmprestimosHistoricos.Count == 0)
+        {
+        <h4>Cliente não tem empréstimos no histórico</h4>
+        }
+        <hr />
+        <br />
+    </dl>
+
+</div>
+<div>
+    <br/>
+    <a asp-action="Index">Voltar para lista</a>
+</div>
