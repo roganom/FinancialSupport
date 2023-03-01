@@ -1,0 +1,20 @@
+﻿@{
+    ViewData["Title"] = "Index";
+}
+
+<h1> Resultado do envio </h1>
+<hr />
+<div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        @if (ViewData["Erro"] != null)
+        {
+            <h6>@ViewData["Erro"]</h6>
+        }
+    </div>
+    <div class="container">
+        @if (ViewData["Resultado"] != null)
+        {
+            <h6>@ViewData["Resultado"]</h6>
+        }
+    </div>
+</div>

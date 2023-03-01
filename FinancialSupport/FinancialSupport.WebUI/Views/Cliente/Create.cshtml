@@ -1,5 +1,7 @@
 ﻿@using FinancialSupport.WebUI.ViewModels.Shared
-@model FinancialSupport.Application.DTOs.UsuarioDTO
+@await Html.PartialAsync("_CadastraNovoCliente")
+
+@*@model FinancialSupport.Application.DTOs.UsuarioDTO
 @{
     ViewData["Title"] = "Cadastramento de novo cliente";
 }
@@ -38,4 +40,4 @@
             </div>
         </div>
     </div>
-</form>
+</form>*@

@@ -1,5 +1,6 @@
 ﻿using FinancialSupport.Application.DTOs;
 using FinancialSupport.Application.Interfaces;
+using FinancialSupport.Domain.Entities;
 using FinancialSupport.WebUI.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,17 +14,17 @@ namespace FinancialSupport.WebUI.Controllers
         private readonly IUsuarioService _usuarioService;
         private readonly IEmprestimoService _emprestimoService;
         private readonly IParcelaService _parcelaService;
-        private readonly IWebHostEnvironment _environment;
+        private readonly IWebHostEnvironment _appEnvironment;
 
         public ClienteController(IUsuarioService usuarioService,
-                                 IWebHostEnvironment environment,
                                  IEmprestimoService emprestimo,
-                                 IParcelaService parcelaService)
+                                 IParcelaService parcelaService,
+                                 IWebHostEnvironment appEvironment)
         {
             _usuarioService = usuarioService;
             _parcelaService = parcelaService;
             _emprestimoService = emprestimo;
-            _environment = environment;
+            _appEnvironment = appEvironment;
         }
         #region Indice
         [HttpGet]
@@ -63,7 +64,7 @@ namespace FinancialSupport.WebUI.Controllers
 
             if (cliente == null) return NotFound("Não existe cliente com esse Id.");
 
-            var wwwroot = _environment.WebRootPath;
+            var wwwroot = _appEnvironment.WebRootPath;
             var imagem = Path.Combine(wwwroot, "Imagens\\" + cliente.Foto);
             var exists = System.IO.File.Exists(imagem);
             ViewBag.ImageExist = exists;
@@ -77,68 +78,72 @@ namespace FinancialSupport.WebUI.Controllers
 
             viewModel.Foto = usuarioDto.Foto;
             viewModel.Nome = usuarioDto.Nome;
-            viewModel.Limite = (decimal)usuarioDto.Limite;
-            viewModel.LimiteDisponivel = (decimal)usuarioDto.LimiteDisponivel;
+            viewModel.Limite = (decimal?)usuarioDto.Limite;
+            viewModel.LimiteDisponivel = (decimal?)usuarioDto.LimiteDisponivel;
 
-            foreach (var emp in usuarioDto.Emprestimos)
+            if (usuarioDto.Emprestimos != null)
             {
-                var objAtivo = new EmprestimoListaViewModel();
-                var objHistorico = new HistoricoListaViewModel();
-                decimal EmprestimoInativoIdValorDasParcelas = 0;
-                int EmprestimoInativoIdNumeroDeParcelas = 0;
-                int EmprestimoInativoIdNumeroDeParcelasEmAtraso = 0;
-                int QtdeParcelasPagas = 0;
-                int QtdeParcelasAtrasadas = 0;
-
-                if (emp.Ativo)
+                foreach (var emp in usuarioDto.Emprestimos)
                 {
-                    objAtivo.Data = emp.Data.Value.ToString("dd/MM/yyyy");
-                    objAtivo.Valor = emp.Valor.ToString("N2");
-                    if (emp.NumeroParcelas != 0 && emp.Parcelas.Count > 0)
-                    {
-                        /// será que eu tenho um empréstimo sem parcela???
-                        objAtivo.ValorParcela = (emp.Parcelas[0].ValorParcela).ToString("N2");
-                    }
+                    var objAtivo = new EmprestimoListaViewModel();
+                    var objHistorico = new HistoricoListaViewModel();
+                    decimal EmprestimoInativoIdValorDasParcelas = 0;
+                    int EmprestimoInativoIdNumeroDeParcelas = 0;
+                    int EmprestimoInativoIdNumeroDeParcelasEmAtraso = 0;
+                    int QtdeParcelasPagas = 0;
+                    int QtdeParcelasAtrasadas = 0;
 
-                    foreach (var parc in emp.Parcelas)
+                    if (emp.Ativo)
                     {
-                        if (parc.DataPagamento != null && parc.ValorPagamento >= parc.ValorParcela)
-                            QtdeParcelasPagas += 1;
-                        else
+                        objAtivo.Data = emp.Data.Value.ToString("dd/MM/yyyy");
+                        objAtivo.Valor = emp.Valor.ToString("N2");
+                        if (emp.NumeroParcelas != 0 && emp.Parcelas.Count > 0)
                         {
-                            if ((parc.DataParcela < DateTime.Today) && (!parc.ValorPagamento.HasValue || (parc.ValorPagamento < parc.ValorParcela)))    // ############# assim mesmo que faço a comparação? e as horas?
-                                QtdeParcelasAtrasadas += 1;
+                            /// será que eu tenho um empréstimo sem parcela???
+                            objAtivo.ValorParcela = (emp.Parcelas[0].ValorParcela).ToString("N2");
                         }
+
+                        foreach (var parc in emp.Parcelas)
+                        {
+                            if (parc.DataPagamento != null && parc.ValorPagamento >= parc.ValorParcela)
+                                QtdeParcelasPagas += 1;
+                            else
+                            {
+                                if ((parc.DataParcela < DateTime.Today) && (!parc.ValorPagamento.HasValue || (parc.ValorPagamento < parc.ValorParcela)))    // ############# assim mesmo que faço a comparação? e as horas?
+                                    QtdeParcelasAtrasadas += 1;
+                            }
+                        }
+                        objAtivo.QtdeParcelasPagas = QtdeParcelasPagas.ToString();
+                        objAtivo.QtdeParcelasAtrasadas = QtdeParcelasAtrasadas.ToString();
+
+                        viewModel.EmprestimosAtivos.Add(objAtivo);
                     }
-                    objAtivo.QtdeParcelasPagas = QtdeParcelasPagas.ToString();
-                    objAtivo.QtdeParcelasAtrasadas = QtdeParcelasAtrasadas.ToString();
-
-                    viewModel.EmprestimosAtivos.Add(objAtivo);
-                }
-                else
-                {
-                    objHistorico.EmprestimoInativoIdData = emp.Data.Value.ToString("dd/MM/yyyy");
-                    objHistorico.EmprestimoInativoIdValor = emp.Valor.ToString("N2");
-
-                    foreach (var parc in emp.Parcelas)
-                    {
-                        EmprestimoInativoIdValorDasParcelas += parc.ValorParcela;
-                        EmprestimoInativoIdNumeroDeParcelas += 1;
-                        if (parc.DataPagamento > parc.DataParcela)              // ############# comparar só os dias (não considerar horas!!!)
-                            EmprestimoInativoIdNumeroDeParcelasEmAtraso += 1;
-
-                    }
-                    if (EmprestimoInativoIdNumeroDeParcelas != 0)
-                        objHistorico.EmprestimoInativoIdValorDasParcelas = (EmprestimoInativoIdValorDasParcelas / EmprestimoInativoIdNumeroDeParcelas).ToString();
                     else
-                        objHistorico.EmprestimoInativoIdValorDasParcelas = "0";
+                    {
+                        objHistorico.EmprestimoInativoIdData = emp.Data.Value.ToString("dd/MM/yyyy");
+                        objHistorico.EmprestimoInativoIdValor = emp.Valor.ToString("N2");
 
-                    objHistorico.EmprestimoInativoIdNumeroDeParcelas = EmprestimoInativoIdNumeroDeParcelas.ToString();
-                    objHistorico.EmprestimoInativoIdNumeroDeParcelasEmAtraso = EmprestimoInativoIdNumeroDeParcelasEmAtraso.ToString();
+                        foreach (var parc in emp.Parcelas)
+                        {
+                            EmprestimoInativoIdValorDasParcelas += parc.ValorParcela;
+                            EmprestimoInativoIdNumeroDeParcelas += 1;
+                            if (parc.DataPagamento > parc.DataParcela)              // ############# comparar só os dias (não considerar horas!!!)
+                                EmprestimoInativoIdNumeroDeParcelasEmAtraso += 1;
 
-                    viewModel.EmprestimosHistoricos.Add(objHistorico);
+                        }
+                        if (EmprestimoInativoIdNumeroDeParcelas != 0)
+                            objHistorico.EmprestimoInativoIdValorDasParcelas = (EmprestimoInativoIdValorDasParcelas / EmprestimoInativoIdNumeroDeParcelas).ToString();
+                        else
+                            objHistorico.EmprestimoInativoIdValorDasParcelas = "0";
+
+                        objHistorico.EmprestimoInativoIdNumeroDeParcelas = EmprestimoInativoIdNumeroDeParcelas.ToString();
+                        objHistorico.EmprestimoInativoIdNumeroDeParcelasEmAtraso = EmprestimoInativoIdNumeroDeParcelasEmAtraso.ToString();
+
+                        viewModel.EmprestimosHistoricos.Add(objHistorico);
+                    }
                 }
             }
+
             return viewModel;
         }
         #endregion
@@ -247,13 +252,13 @@ namespace FinancialSupport.WebUI.Controllers
 
             if (cliente == null) return NotFound("Não existe cliente com esse Id.");
 
-            var wwwroot = _environment.WebRootPath;
+            var wwwroot = _appEnvironment.WebRootPath;
             var imagem = Path.Combine(wwwroot, "Imagens\\" + cliente.Foto);
             var exists = System.IO.File.Exists(imagem);
             ViewBag.ImageExist = exists;
 
             var listaEmprestimosAtivos = new List<SelectListItem>();
-            int IdEmprestimo = 0;
+            //int IdEmprestimo = 0;
 
             listaEmprestimosAtivos.Add(new SelectListItem { Value = "0", Text = "Selecione um empréstimo" });
 
@@ -330,9 +335,9 @@ namespace FinancialSupport.WebUI.Controllers
             {
                 var objAtivo = new EmprestimoListaViewModel();
 
-                decimal EmprestimoInativoIdValorDasParcelas = 0;
-                int EmprestimoInativoIdNumeroDeParcelas = 0;
-                int EmprestimoInativoIdNumeroDeParcelasEmAtraso = 0;
+                //decimal EmprestimoInativoIdValorDasParcelas = 0;
+                //int EmprestimoInativoIdNumeroDeParcelas = 0;
+                //int EmprestimoInativoIdNumeroDeParcelasEmAtraso = 0;
                 int QtdeParcelasPagas = 0;
                 int QtdeParcelasAtrasadas = 0;
 
@@ -518,5 +523,68 @@ namespace FinancialSupport.WebUI.Controllers
             return RedirectToAction("Pagamento", new { id = UsuarioId, tipoMensagem = tipoMensagem, mensagem = mensagem });
         }
         #endregion
+
+        #region EnviarArquivo
+        public async Task<IActionResult> EnviarArquivo(IFormFile arquivo, string Nome, decimal Limite)
+        {
+            //verifica se foi passado arquivo
+            if (arquivo == null || arquivo.Length == 0)
+            {
+                //retorna a viewdata com erro
+                ViewData["Erro"] = "Error: Arquivo não selecionado";
+                return View(ViewData);
+            }
+            //verifica o tipo de arquivo
+            if (arquivo.FileName.Contains(".jpg") || arquivo.FileName.Contains(".gif") ||
+                arquivo.FileName.Contains(".png") || arquivo.FileName.Contains(".jpeg"))
+            {
+                //< obtém o caminho físico da pasta wwwroot >
+                string caminho_WebRoot = _appEnvironment.WebRootPath;
+                // monta o caminho onde vamos salvar o arquivo : 
+                // ~\wwwroot\Arquivos\Arquivos_Usuario\Recebidos
+                string caminhoDestinoArquivo = caminho_WebRoot + "\\Imagens\\";
+                // incluir a pasta Recebidos e o nome do arquivo enviado : 
+                // ~\wwwroot\Arquivos\Arquivos_Usuario\Recebidos\
+                string caminhoDestinoArquivoOriginal = caminhoDestinoArquivo + arquivo.FileName;
+                //copia o arquivo para o local de destino original
+
+                while (System.IO.File.Exists(caminhoDestinoArquivoOriginal))
+                {
+                    string extensao = caminhoDestinoArquivoOriginal.Substring(caminhoDestinoArquivoOriginal.Length - 4, 4);
+                    string nome = caminhoDestinoArquivoOriginal.Substring(0, caminhoDestinoArquivoOriginal.Length - 4);
+                    //var agora = string.Format()
+                    nome += DateTime.Now.ToString("yyyyMMddHHmmss");
+                    caminhoDestinoArquivoOriginal = nome + extensao;
+                }
+
+                using (var stream = new FileStream(caminhoDestinoArquivoOriginal, FileMode.Create))
+                {
+                    await arquivo.CopyToAsync(stream);
+                }
+
+                int a = caminhoDestinoArquivo.Length;
+                int b = caminhoDestinoArquivoOriginal.Length;
+
+                string nomeFoto = caminhoDestinoArquivoOriginal.Substring(a, b - a);
+
+                //monta a ViewData que será exibida na view como resultado do envio 
+                ViewData["Resultado"] = $"Arquivo {nomeFoto} carregado e salvo com sucesso.";
+                //retorna a viewdata
+                return RedirectToAction("Create", new { Nome = Nome, Limite = Limite, Foto = nomeFoto });//, tipoMensagem = tipoMensagem, mensagem = mensagem });
+                //return View(ViewData);
+            }
+            else
+            {
+                //retorna a viewdata com erro
+                ViewData["Erro"] = "Error: Tipo de arquivo inválido";
+                return View(ViewData);
+            }
+        }
+        #endregion
+
+        public IActionResult Upload()
+        {
+            return View();
+        }
     }
 }
