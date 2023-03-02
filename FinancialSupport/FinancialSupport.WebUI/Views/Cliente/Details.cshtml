@@ -8,11 +8,11 @@
         <div class="col-sm-2" width="25%">
             @if (!ViewBag.ImageExist)
             {
-                <img src="~/imagens/SemImagem.png" class="rounded-circle" width="110" height="150" asp-append-version="true" />
+                <img src="~/imagens/SemImagem.png" class="rounded-circle" width="110" asp-append-version="true" />
             }
             else
             {
-                <img src="~/imagens/@Model.Foto" class="rounded-circle" width="110" height="150" asp-append-version="true" />
+                <img src="~/imagens/@Model.Foto" class="rounded-circle" width="110" asp-append-version="true" />
             }
         </div>
         <div class="col-sm-10 d-flex flex-column mb-3">

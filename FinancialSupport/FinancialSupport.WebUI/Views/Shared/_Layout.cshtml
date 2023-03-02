@@ -33,6 +33,7 @@
                                 <li><a class="dropdown-item" asp-area="" asp-controller="Usuario" asp-action="Index">Clientes</a></li>
                                 <li><a class="dropdown-item" asp-area="" asp-controller="Emprestimo" asp-action="Index">Empréstimos</a></li>
                                 <li><a class="dropdown-item" asp-area="" asp-controller="Parcela" asp-action="Index">Parcelas</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Upload" asp-action="Index">Enviar foto</a></li>
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
@@ -45,7 +46,7 @@
                                 <li><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="TrocaSenha">Troca de senha</a></li>
                             </ul>
                         </li>
-                    </ul>
+                        </ul>
                     <ul class="navbar-nav m1-auto">
                         @await Html.PartialAsync("_LoginPartial")
                     </ul>
@@ -53,6 +54,7 @@
             </div>
         </nav>
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
