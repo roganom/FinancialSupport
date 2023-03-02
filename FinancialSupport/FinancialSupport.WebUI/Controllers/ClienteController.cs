@@ -55,8 +55,8 @@ namespace FinancialSupport.WebUI.Controllers
                 usuario.LimiteDisponivel = usuario.Limite;
                 usuario.Foto = foto;
                 await _usuarioService.Add(usuario);
-                if (url.Contains("/Cliente/Create")) return RedirectToAction("Cliente", "Index");
-                else if (url.Contains("/Usuario/Create")) return RedirectToAction("Usuario", "Index");
+                if (url.Contains("/Cliente/Create")) return RedirectToAction("Index", "Cliente");
+                else if (url.Contains("/Usuario/Create")) return RedirectToAction("Index", "Usuario");
                 else return RedirectToAction(nameof(Index));
             }
 
