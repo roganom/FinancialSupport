@@ -44,17 +44,22 @@ namespace FinancialSupport.WebUI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(UsuarioDTO usuario)
+        public async Task<IActionResult> Create(UsuarioDTO usuario, IFormFile? Arquivo, string url)
         {
-            string foto = SobeArquivo(usuario.arquivo).ToString();
+            string foto = SobeArquivo(Arquivo);
+
+            //string url_Atual = HttpContext.Request.Path;
 
             if (ModelState.IsValid)
             {
                 usuario.LimiteDisponivel = usuario.Limite;
                 usuario.Foto = foto;
                 await _usuarioService.Add(usuario);
-                return RedirectToAction(nameof(Index));
+                if (url.Contains("/Cliente/Create")) return RedirectToAction("Cliente", "Index");
+                else if (url.Contains("/Usuario/Create")) return RedirectToAction("Usuario", "Index");
+                else return RedirectToAction(nameof(Index));
             }
+
             return View(usuario);
         }
         #endregion
@@ -529,15 +534,7 @@ namespace FinancialSupport.WebUI.Controllers
         #endregion
 
         #region EnviarArquivo
-        public async Task<IActionResult> EnviarArquivo(IFormFile arquivo)//, string Nome, decimal Limite)
-        {
-            string retorno = SobeArquivo(arquivo).ToString();
-
-            ViewData["Resultado"] = retorno;
-            return View(ViewData);
-        }
-
-        public async Task<string> SobeArquivo(IFormFile arquivo)
+        public string SobeArquivo(IFormFile arquivo)
         {
             //verifica se foi passado arquivo
             if (arquivo == null || arquivo.Length == 0)
@@ -545,7 +542,7 @@ namespace FinancialSupport.WebUI.Controllers
                 //retorna a viewdata com erro
                 //ViewData["Erro"] = "Error: Arquivo não selecionado";
                 //return View(ViewData);
-                return "Error: Arquivo não selecionado";
+                return "Imagem não informada";
             }
             //verifica o tipo de arquivo
             if (arquivo.FileName.Contains(".jpg") || arquivo.FileName.Contains(".gif") ||
@@ -553,26 +550,25 @@ namespace FinancialSupport.WebUI.Controllers
             {
                 //< obtém o caminho físico da pasta wwwroot >
                 string caminho_WebRoot = _appEnvironment.WebRootPath;
-                // monta o caminho onde vamos salvar o arquivo : 
-                // ~\wwwroot\Arquivos\Arquivos_Usuario\Recebidos
-                string caminhoDestinoArquivo = caminho_WebRoot + "\\Imagens\\";
-                // incluir a pasta Recebidos e o nome do arquivo enviado : 
-                // ~\wwwroot\Arquivos\Arquivos_Usuario\Recebidos\
-                string caminhoDestinoArquivoOriginal = caminhoDestinoArquivo + arquivo.FileName;
-                //copia o arquivo para o local de destino original
 
+                // monta o caminho onde vamos salvar o arquivo : 
+                string caminhoDestinoArquivo = caminho_WebRoot + "\\Imagens\\";
+
+                // incluir a pasta o nome do arquivo enviado : 
+                string caminhoDestinoArquivoOriginal = caminhoDestinoArquivo + arquivo.FileName;
+                
+                //copia o arquivo para o local de destino original, mas renomeia caso já exista
                 while (System.IO.File.Exists(caminhoDestinoArquivoOriginal))
                 {
                     string extensao = caminhoDestinoArquivoOriginal.Substring(caminhoDestinoArquivoOriginal.Length - 4, 4);
                     string nome = caminhoDestinoArquivoOriginal.Substring(0, caminhoDestinoArquivoOriginal.Length - 4);
-                    //var agora = string.Format()
                     nome += DateTime.Now.ToString("yyyyMMddHHmmss");
                     caminhoDestinoArquivoOriginal = nome + extensao;
                 }
-
+                //salva o arquivo
                 using (var stream = new FileStream(caminhoDestinoArquivoOriginal, FileMode.Create))
                 {
-                    await arquivo.CopyToAsync(stream);
+                    arquivo.CopyToAsync(stream);
                 }
 
                 int a = caminhoDestinoArquivo.Length;
@@ -580,26 +576,13 @@ namespace FinancialSupport.WebUI.Controllers
 
                 string nomeFoto = caminhoDestinoArquivoOriginal.Substring(a, b - a);
 
-                //monta a ViewData que será exibida na view como resultado do envio 
-                ///////ViewData["Resultado"] = $"Arquivo {nomeFoto} carregado e salvo com sucesso.";
-                //retorna a viewdata
-                //return RedirectToAction("Create", new { Nome = Nome, Limite = Limite, Foto = nomeFoto });//, tipoMensagem = tipoMensagem, mensagem = mensagem });
-                //return View(ViewData);
                 return (nomeFoto);
             }
             else
             {
-                //retorna a viewdata com erro
-                //ViewData["Erro"] = "Error: Tipo de arquivo inválido";
-                //return View(ViewData);
-                return "Error: Tipo de arquivo inválido";
+                return "Tipo de arquivo inválido";
             }
         }
         #endregion
-
-        public IActionResult Upload()
-        {
-            return View();
-        }
     }
 }

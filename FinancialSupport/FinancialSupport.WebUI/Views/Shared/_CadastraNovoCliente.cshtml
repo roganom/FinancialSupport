@@ -3,14 +3,16 @@
     ViewData["Title"] = "Cadastramento de novo cliente";
 }
 <h2>@ViewData["Title"]</h2>
-<form asp-action="Create" method="post">
+
+<form method="post" enctype="multipart/form-data" asp-controller="Cliente" asp-action="Create" method="post">
     <div class="form-horizontal">
         <hr />
-        <div asp-validation-summary="All" class="text-danger"></div>
+
         <div class="form-group">
             <label asp-for="Nome" class="col-md-2 control-label">Nome Completo</label>
             <div class="col-md-10">
                 <input asp-for="Nome" class="form-control" />
+                <span asp-validation-for="Nome" class="text-danger"></span>
             </div>
         </div>
         <br />
@@ -19,51 +21,32 @@
             <label asp-for="Limite" class="col-md-2 control-label">Limite total</label>
             <div class="col-md-10">
                 <input asp-for="Limite" class="form-control" />
+                <span asp-validation-for="Limite" class="text-danger"></span>
             </div>
         </div>
         <br />
 
-        <input asp-for="Foto" class="form-control" hidden/>
-
-        <div class="jumbotrom jumbotron-fluid">
-            <div class="continer">
-                <div class="row">
-                    <section>
-                        <form method="post" enctype="multipart/form-data" asp-controller="Cliente" asp-action="EnviarArquivo">
-                            <div class="form-group">
-                                <div class="col-md-10">
-@*                                    <p>
-                                        Envio de arquivo de imagem:
-                                    </p>*@
-                                    <input type="file" name="arquivo" />
-                                </div>
-@*                                <div class="form-group">
-                                    <div class="col-md-10">
-                                        <input type="submit" name="Enviar Arquivo" />
-                                    </div>
-                                </div>*@
-                            </div>
-
-                            <hr />
-                            <div class"form-group">
-                                <div class="col-md-offset-2 col-md-10">
-                                    <input type="hidden" name="UsuarioCriacao" value="@Context.User.Identity.Name" />
-                                    <input type="hidden" name="Foto" value="mensagem para depurar" />
-                                    @*                <a asp-area="" asp-controller="Upload" asp-action="Index" class="btn btn-warning">Enviar foto do cliente</a>*@
-                                    @*                <a asp-area="" asp-controller="Cliente" asp-action="Upload" class="btn btn-warning">Enviar foto do cliente</a>*@
-                                    @*                <input type="submit" value="Cadastrar" action="Create" class="btn btn-success" />*@
-                                    <input type="submit" name="Enviar imagem" value="Cadastrar" class="btn btn-success" />
-                                    <a asp-action="Index" class="btn btn-info"> Voltar para a lista</a>
-                                </div>
-                            </div>
-
-                        </form>
-                    </section>
-                </div>
+        <div class="form-group">
+            <div class="col-md-10">
+                <input type="file" name="Arquivo" id="Arquivo" />
             </div>
         </div>
 
+        <hr />
+        <div class"form-group">
+            <div class="col-md-offset-2 col-md-10">
 
+                <input type="hidden" name="url" id="url" />
+                <script>
+                    var path = window.location.href;
+                    document.getElementById("url").value = path;
+                </script>
+
+                <input type="hidden" name="UsuarioCriacao" value="@Context.User.Identity.Name" />
+                <input type="submit" name="Enviar imagem" value="Cadastrar" class="btn btn-success" />
+                <a asp-action="Index" class="btn btn-info"> Voltar para a lista</a>
+            </div>
+        </div>
 
     </div>
 </form>
