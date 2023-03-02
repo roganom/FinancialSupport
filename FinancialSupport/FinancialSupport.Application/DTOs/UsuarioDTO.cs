@@ -1,4 +1,5 @@
 ﻿using FinancialSupport.Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
@@ -36,5 +37,6 @@ namespace FinancialSupport.Application.DTOs
         public string? UsuarioAlteracao { get; set; }
         public Boolean? Valendo { get; set; }
         public List<Emprestimo>? Emprestimos { get; set; }
+        public IFormFile? arquivo { get; set; }
     }
 }

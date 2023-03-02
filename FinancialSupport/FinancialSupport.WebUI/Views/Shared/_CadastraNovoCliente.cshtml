@@ -32,9 +32,9 @@
                         <form method="post" enctype="multipart/form-data" asp-controller="Cliente" asp-action="EnviarArquivo">
                             <div class="form-group">
                                 <div class="col-md-10">
-                                    <p>
+@*                                    <p>
                                         Envio de arquivo de imagem:
-                                    </p>
+                                    </p>*@
                                     <input type="file" name="arquivo" />
                                 </div>
 @*                                <div class="form-group">
@@ -48,10 +48,11 @@
                             <div class"form-group">
                                 <div class="col-md-offset-2 col-md-10">
                                     <input type="hidden" name="UsuarioCriacao" value="@Context.User.Identity.Name" />
+                                    <input type="hidden" name="Foto" value="mensagem para depurar" />
                                     @*                <a asp-area="" asp-controller="Upload" asp-action="Index" class="btn btn-warning">Enviar foto do cliente</a>*@
                                     @*                <a asp-area="" asp-controller="Cliente" asp-action="Upload" class="btn btn-warning">Enviar foto do cliente</a>*@
                                     @*                <input type="submit" value="Cadastrar" action="Create" class="btn btn-success" />*@
-                                    <input type="submit" name="Enviar Arquivo" value="Cadastrar" class="btn btn-success" />
+                                    <input type="submit" name="Enviar imagem" value="Cadastrar" class="btn btn-success" />
                                     <a asp-action="Index" class="btn btn-info"> Voltar para a lista</a>
                                 </div>
                             </div>

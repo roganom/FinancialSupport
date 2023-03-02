@@ -5,6 +5,7 @@ using FinancialSupport.WebUI.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Drawing;
 
 namespace FinancialSupport.WebUI.Controllers
 {
@@ -45,9 +46,12 @@ namespace FinancialSupport.WebUI.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(UsuarioDTO usuario)
         {
+            string foto = SobeArquivo(usuario.arquivo).ToString();
+
             if (ModelState.IsValid)
             {
                 usuario.LimiteDisponivel = usuario.Limite;
+                usuario.Foto = foto;
                 await _usuarioService.Add(usuario);
                 return RedirectToAction(nameof(Index));
             }
@@ -525,14 +529,23 @@ namespace FinancialSupport.WebUI.Controllers
         #endregion
 
         #region EnviarArquivo
-        public async Task<IActionResult> EnviarArquivo(IFormFile arquivo, string Nome, decimal Limite)
+        public async Task<IActionResult> EnviarArquivo(IFormFile arquivo)//, string Nome, decimal Limite)
+        {
+            string retorno = SobeArquivo(arquivo).ToString();
+
+            ViewData["Resultado"] = retorno;
+            return View(ViewData);
+        }
+
+        public async Task<string> SobeArquivo(IFormFile arquivo)
         {
             //verifica se foi passado arquivo
             if (arquivo == null || arquivo.Length == 0)
             {
                 //retorna a viewdata com erro
-                ViewData["Erro"] = "Error: Arquivo não selecionado";
-                return View(ViewData);
+                //ViewData["Erro"] = "Error: Arquivo não selecionado";
+                //return View(ViewData);
+                return "Error: Arquivo não selecionado";
             }
             //verifica o tipo de arquivo
             if (arquivo.FileName.Contains(".jpg") || arquivo.FileName.Contains(".gif") ||
@@ -568,16 +581,18 @@ namespace FinancialSupport.WebUI.Controllers
                 string nomeFoto = caminhoDestinoArquivoOriginal.Substring(a, b - a);
 
                 //monta a ViewData que será exibida na view como resultado do envio 
-                ViewData["Resultado"] = $"Arquivo {nomeFoto} carregado e salvo com sucesso.";
+                ///////ViewData["Resultado"] = $"Arquivo {nomeFoto} carregado e salvo com sucesso.";
                 //retorna a viewdata
-                return RedirectToAction("Create", new { Nome = Nome, Limite = Limite, Foto = nomeFoto });//, tipoMensagem = tipoMensagem, mensagem = mensagem });
+                //return RedirectToAction("Create", new { Nome = Nome, Limite = Limite, Foto = nomeFoto });//, tipoMensagem = tipoMensagem, mensagem = mensagem });
                 //return View(ViewData);
+                return (nomeFoto);
             }
             else
             {
                 //retorna a viewdata com erro
-                ViewData["Erro"] = "Error: Tipo de arquivo inválido";
-                return View(ViewData);
+                //ViewData["Erro"] = "Error: Tipo de arquivo inválido";
+                //return View(ViewData);
+                return "Error: Tipo de arquivo inválido";
             }
         }
         #endregion
