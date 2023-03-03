@@ -44,11 +44,9 @@ namespace FinancialSupport.WebUI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(UsuarioDTO usuario, IFormFile? Arquivo, string url)
+        public async Task<IActionResult> Create(UsuarioDTO usuario, IFormFile? arquivo, string url)
         {
-            string foto = SobeArquivo(Arquivo);
-
-            //string url_Atual = HttpContext.Request.Path;
+            string foto = await SobeArquivo(arquivo);
 
             if (ModelState.IsValid)
             {
@@ -533,8 +531,8 @@ namespace FinancialSupport.WebUI.Controllers
         }
         #endregion
 
-        #region EnviarArquivo
-        public string SobeArquivo(IFormFile arquivo)
+        #region SobeArquivo
+        public async Task<string> SobeArquivo(IFormFile arquivo)
         {
             //verifica se foi passado arquivo
             if (arquivo == null || arquivo.Length == 0)
@@ -568,7 +566,7 @@ namespace FinancialSupport.WebUI.Controllers
                 //salva o arquivo
                 using (var stream = new FileStream(caminhoDestinoArquivoOriginal, FileMode.Create))
                 {
-                    arquivo.CopyToAsync(stream);
+                    await arquivo.CopyToAsync(stream);
                 }
 
                 int a = caminhoDestinoArquivo.Length;
