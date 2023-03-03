@@ -1,11 +1,9 @@
 ﻿using FinancialSupport.Application.DTOs;
 using FinancialSupport.Application.Interfaces;
-using FinancialSupport.Domain.Entities;
 using FinancialSupport.WebUI.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Drawing;
 
 namespace FinancialSupport.WebUI.Controllers
 {
@@ -46,13 +44,19 @@ namespace FinancialSupport.WebUI.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(UsuarioDTO usuario, IFormFile? arquivo, string url)
         {
-            string foto = await SobeArquivo(arquivo);
+            string foto;
+
+            if (arquivo != null)
+                foto = await SobeArquivo(arquivo);
+            else
+                foto = "Imagem não informada";
 
             if (ModelState.IsValid)
             {
                 usuario.LimiteDisponivel = usuario.Limite;
                 usuario.Foto = foto;
                 await _usuarioService.Add(usuario);
+
                 if (url.Contains("/Cliente/Create")) return RedirectToAction("Index", "Cliente");
                 else if (url.Contains("/Usuario/Create")) return RedirectToAction("Index", "Usuario");
                 else return RedirectToAction(nameof(Index));
@@ -554,7 +558,7 @@ namespace FinancialSupport.WebUI.Controllers
 
                 // incluir a pasta o nome do arquivo enviado : 
                 string caminhoDestinoArquivoOriginal = caminhoDestinoArquivo + arquivo.FileName;
-                
+
                 //copia o arquivo para o local de destino original, mas renomeia caso já exista
                 while (System.IO.File.Exists(caminhoDestinoArquivoOriginal))
                 {
