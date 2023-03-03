@@ -62,7 +62,7 @@ namespace FinancialSupport.WebUI.Controllers
                 string nomeFoto = caminhoDestinoArquivoOriginal.Substring(a, b - a);
 
                 //monta a ViewData que será exibida na view como resultado do envio 
-                ViewData["Resultado"] = $"Arquivo {nomeFoto} carregado e salvo com sucesso.";
+                ViewData["Resultado"] = $"Arquivo carregado com sucesso e salvo como  {nomeFoto}  .";
                 //retorna a viewdata
                 //return RedirectToAction(nameof(Create));
                 return View(ViewData);
